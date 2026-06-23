@@ -1,0 +1,1 @@
+from vector_store.qdrant_store import client
