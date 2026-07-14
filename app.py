@@ -37,3 +37,5 @@ response = generate_answer(prompt)
 
 print("\nAnswer:\n")
 print(response)
+
+client.close()
