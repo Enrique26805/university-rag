@@ -1,7 +1,10 @@
 from rag.pipeline import ask
 
-response = ask(
-    "What is self-attention?"
-)
+result = ask("What is self-attention?")
 
-print(response)
+print("\nAnswer:\n")
+print(result["answer"])
+
+print("\nSources:")
+for source in result["sources"]:
+    print(f"- {source}")
