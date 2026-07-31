@@ -4,7 +4,8 @@ venv/
 
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 
 # VS Code
 .vscode/
@@ -19,8 +20,19 @@ Thumbs.db
 # Qdrant
 qdrant_storage/
 
-# Models
-models/
-
 # Logs
 logs/
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Environment files
+.env.*

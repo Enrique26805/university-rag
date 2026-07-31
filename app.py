@@ -1,41 +1,25 @@
-from embeddings.embedder import embed_text
-from llm.generator import generate_answer
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-from vector_store.qdrant_store import(
-    client,
-    COLLECTION_NAME
-)
+from rag.pipeline import ask
 
-question = input("Ask a question: ")
+app = FastAPI()
 
-query_embedding = embed_text(question)
 
-results = client.query_points(
-    collection_name=COLLECTION_NAME,
-    query=query_embedding.tolist(),
-    limit = 3
-)
+class QuestionRequest(BaseModel):
+    question: str
 
-context = ""
 
-for point in results.points:
-    context += point.payload["text"]
-    context += "\n\n"
+@app.get("/")
+def home():
+    return {
+        "message": "University RAG API is running!"
+    }
 
-prompt = f"""
-Use the following context to answer the question.
 
-Context:
-{context}
+@app.post("/ask")
+def ask_question(request: QuestionRequest):
 
-Question:
-{question}
+    result = ask(request.question)
 
-Answer:
-"""
-response = generate_answer(prompt)
-
-print("\nAnswer:\n")
-print(response)
-
-client.close()
+    return result

@@ -1,6 +1,6 @@
 from embeddings.embedder import embed_text
 
-from vector_store.qdrant_store import (
+from vector_db.qdrant_store import (
     client,
     COLLECTION_NAME
 )

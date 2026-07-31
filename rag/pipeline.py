@@ -1,6 +1,6 @@
 from rag.retriever import retrieve_context
 from rag.prompt_builder import build_prompt
-from llm.generator import generate_answer
+from generation.generator import generate_answer
 
 
 def ask(question):
@@ -24,8 +24,13 @@ def ask(question):
         context += "\n\n"
 
         # Store unique source names
-        if source not in sources:
-            sources.append(source)
+        if source not in [doc["document"] for doc in sources]:
+            sources.append(
+                {
+                    "document": source,
+                    "score": round(chunk.score, 4)
+                }
+            )
 
     # Build the prompt
     prompt = build_prompt(context, question)
@@ -35,6 +40,8 @@ def ask(question):
 
     # Return both the answer and the document sources
     return {
+        "question": question,
         "answer": answer,
-        "sources": sources
-    }
+        "sources": sources,
+        "retrieved_chunks": len(retrieved_chunks)
+        }
