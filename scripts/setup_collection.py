@@ -1,6 +1,6 @@
 from qdrant_client.models import VectorParams, Distance
 
-from vector_store.qdrant_store import (
+from vector_db.qdrant_store import (
     client,
     COLLECTION_NAME
 )

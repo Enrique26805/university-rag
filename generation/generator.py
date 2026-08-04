@@ -1,9 +1,10 @@
 from ollama import chat
+from config.settings import LLM_MODEL
 
 def generate_answer(prompt):
 
     response = chat(
-        model="llama3.1:8b",
+        model=LLM_MODEL,
         messages=[
             {
                 "role": "user",
