@@ -1,4 +1,5 @@
 from embeddings.embedder import embed_text
+from config.settings import TOP_K
 
 from vector_db.qdrant_store import (
     client,
@@ -6,7 +7,7 @@ from vector_db.qdrant_store import (
 )
 
 
-def retrieve_context(question, top_k=3):
+def retrieve_context(question, top_k=TOP_K):
 
     query_embedding = embed_text(question)
 
