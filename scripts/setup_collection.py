@@ -1,9 +1,11 @@
 from qdrant_client.models import VectorParams, Distance
 
 from vector_db.qdrant_store import (
-    client,
+    create_client,
     COLLECTION_NAME
 )
+
+client = create_client()
 
 if not client.collection_exists(COLLECTION_NAME):
 
@@ -19,3 +21,5 @@ if not client.collection_exists(COLLECTION_NAME):
 
 else:
     print("Collection already exists")
+
+client.close()

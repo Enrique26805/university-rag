@@ -3,16 +3,12 @@ import time
 
 from embeddings.embedder import embed_text
 from config.settings import TOP_K
-
-from vector_db.qdrant_store import (
-    client,
-    COLLECTION_NAME
-)
+from vector_db.qdrant_store import COLLECTION_NAME
 
 logger = logging.getLogger(__name__)
 
 
-def retrieve_context(question, top_k=TOP_K):
+def retrieve_context(question, client, top_k=TOP_K):
 
     start = time.perf_counter()
 

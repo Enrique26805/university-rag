@@ -1,6 +1,9 @@
 from rag.pipeline import ask
+from vector_db.qdrant_store import create_client
 
-result = ask("What is self-attention?")
+client = create_client()
+result = ask("What is self-attention?", client)
+client.close()
 
 print("\nAnswer:\n")
 print(result["answer"])

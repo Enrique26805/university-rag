@@ -2,9 +2,11 @@ from embeddings.embedder import embed_text
 from generation.generator import generate_answer
 
 from vector_db.qdrant_store import(
-    client,
+    create_client,
     COLLECTION_NAME
 )
+
+client = create_client()
 
 question = input("Ask a question: ")
 

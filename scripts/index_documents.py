@@ -2,12 +2,14 @@ from ingestion.document_loader import load_documents
 from ingestion.chunk_documents import chunk_documents
 from embeddings.embedder import embed_text
 from vector_db.qdrant_store import (
-    client,
+    create_client,
     COLLECTION_NAME
 )
 from qdrant_client.models import PointStruct
 
 UPLOAD_BATCH_SIZE = 100
+
+client = create_client()
 
 print("Loading documents...")
 documents = load_documents()
@@ -45,3 +47,5 @@ for start in range(0, len(points), UPLOAD_BATCH_SIZE):
     )
 
 print(f"Indexed {len(points)} chunks successfully!")
+
+client.close()

@@ -13,7 +13,7 @@ from config.settings import COLLECTION_NAME
 from embeddings.embedder import embed_text
 from ingestion.chunk_documents import chunk_documents
 from ingestion.document_loader import load_documents
-from vector_db.qdrant_store import client
+from vector_db.qdrant_store import create_client
 
 EMBEDDING_SIZE = 384
 UPLOAD_BATCH_SIZE = 100
@@ -27,7 +27,7 @@ def confirm(collection_name):
     return answer.strip().lower() == "y"
 
 
-def recreate_collection(collection_name):
+def recreate_collection(client, collection_name):
     if client.collection_exists(collection_name):
         client.delete_collection(collection_name)
         print(f"Dropped existing collection '{collection_name}'.")
@@ -39,7 +39,7 @@ def recreate_collection(collection_name):
     print(f"Created collection '{collection_name}'.")
 
 
-def reindex(collection_name):
+def reindex(client, collection_name):
     print("Loading documents...")
     documents = load_documents()
 
@@ -78,9 +78,12 @@ def main():
         print("Aborted. No changes were made.")
         sys.exit(0)
 
-    recreate_collection(COLLECTION_NAME)
-    reindex(COLLECTION_NAME)
-    client.close()
+    client = create_client()
+    try:
+        recreate_collection(client, COLLECTION_NAME)
+        reindex(client, COLLECTION_NAME)
+    finally:
+        client.close()
 
 
 if __name__ == "__main__":

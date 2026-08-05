@@ -1,19 +1,32 @@
 import logging
 import time
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from ollama import ResponseError
+from qdrant_client import QdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
 
 from config.logging_config import configure_logging
 from models.schemas import QuestionRequest, QuestionResponse
 from rag.pipeline import ask
+from vector_db.qdrant_store import create_client
 
 configure_logging()
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Created once per server process (not at import time) so the reload
+    # watcher process never opens the local Qdrant storage folder.
+    app.state.qdrant_client = create_client()
+    yield
+    app.state.qdrant_client.close()
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,6 +34,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def get_qdrant_client(request: Request) -> QdrantClient:
+    return request.app.state.qdrant_client
 
 
 @app.get("/")
@@ -44,7 +61,10 @@ def _log_ask_failed(error, start):
 
 
 @app.post("/ask", response_model=QuestionResponse)
-def ask_question(request: QuestionRequest):
+def ask_question(
+    request: QuestionRequest,
+    qdrant_client: QdrantClient = Depends(get_qdrant_client),
+):
     start = time.perf_counter()
 
     logger.info(
@@ -53,7 +73,7 @@ def ask_question(request: QuestionRequest):
     )
 
     try:
-        result = ask(request.question)
+        result = ask(request.question, qdrant_client)
     except UnexpectedResponse as e:
         _log_ask_failed(e, start)
         raise HTTPException(status_code=503, detail=f"Retrieval backend unavailable: {e}")

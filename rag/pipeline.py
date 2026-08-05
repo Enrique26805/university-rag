@@ -3,10 +3,10 @@ from rag.prompt_builder import build_prompt
 from generation.generator import generate_answer
 
 
-def ask(question):
+def ask(question, client):
 
     # Retrieve the most relevant chunks from Qdrant
-    retrieved_chunks = retrieve_context(question)
+    retrieved_chunks = retrieve_context(question, client)
 
     context = ""
     sources = []
